@@ -23,10 +23,10 @@ let questions = [
     },
     {
         question: `What is the correct syntax for referring to an external script called 'demo.js'?`,
-        choice1: `<xmp><script href='demo.js'></xmp>`,
-        choice2: `<xmp><script name='demo.js'></xmp>`,
-        choice3: `<xmp><script src='demo.js'></xmp>`,
-        choice4: `<xmp><script file='demo.js'></xmp>`,
+        choice1: `<xmp><script href='demo.js'></script></xmp>`,
+        choice2: `<xmp><script name='demo.js'></script></xmp>`,
+        choice3: `<xmp><script src='demo.js'></script></xmp>`,
+        choice4: `<xmp><script file='demo.js'></script></xmp>`,
         answer: 3,
     },
     {
@@ -63,25 +63,35 @@ const getNewQuestion = () => {
     choices.forEach((choice) => {
         const number = choice.dataset['number'];
         choice.innerHTML = currentQuestion['choice' + number];
-        console.log(choice);
-        // Remove the question that was just displayed
-        availableQuestions.splice(questionIndex, 1);
-        // Wait after everything has been loaded
-        acceptingAnswers = true;
     });
+    // Remove the question that was just displayed
+    availableQuestions.splice(questionIndex, 1);
+    // Wait after everything has been loaded
+    acceptingAnswers = true;
 };
 
 choices.forEach((choice) => {
     choice.addEventListener('click', (event) => {
-        console.log(event.target);
         // If not ready to receive answers, just ignore
         if (!acceptingAnswers) return;
         // Set to false due to a delay in page reload
         acceptingAnswers = false;
         const selectedChoice = event.target;
         const selectedAnswer = selectedChoice.dataset['number'];
-        console.log(selectedAnswer);
-        getNewQuestion();
+
+        // Mark as correct/incorrect
+        let classToApply = 'incorrect';
+        if (selectedAnswer == currentQuestion.answer) {
+            classToApply = 'correct';
+        }
+        // const classToApply = selectedAnswer == currentQuestion.answer ? 'correct' : 'incorrect';
+
+        selectedChoice.parentElement.classList.add(classToApply);
+        // Delay when removing class and going to next question
+        setTimeout(() => {
+            selectedChoice.parentElement.classList.remove(classToApply);
+            getNewQuestion();
+        }, 2000);
     });
 });
 
