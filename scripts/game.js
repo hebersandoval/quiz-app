@@ -1,9 +1,14 @@
+// const fetch = require('fetch');
+// import fetch from 'fetch';
+
 const question = document.getElementById('question');
 // Change to an []
 const choices = Array.from(document.getElementsByClassName('choice-text'));
 const progressText = document.getElementById('progress-text');
 const scoreText = document.getElementById('score');
 const progressBarFull = document.getElementById('progress-bar-full');
+const loader = document.getElementById('loader');
+const game = document.getElementById('game');
 
 // Game constants
 const CORRECT_BONUS = 10;
@@ -18,14 +23,37 @@ let availableQuestions = [];
 let questions = [];
 
 // Get question from json file using fetch
-fetch('scripts/questions.json')
+// fetch('scripts/questions.json')
+// Using Open Trivia DB
+fetch('https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=multiple')
     .then((response) => {
         return response.json();
     })
     .then((loadedQuestions) => {
-        console.log(loadedQuestions);
+        console.log(loadedQuestions.results);
+        // Transform each loaded question
+        questions = loadedQuestions.results.map((loadedQuestion) => {
+            const formattedQuestion = {
+                question: loadedQuestion.question,
+            };
+
+            // Contains incorrect answers at this point
+            const answerChoices = [...loadedQuestion.incorrect_answers];
+            // Generate random number for the current answer (0 and 3)
+            formattedQuestion.answer = Math.floor(Math.random() * 3) + 1;
+            // Not zero based, so subtract 1 and not going to remove any elements and put in the correct question
+            answerChoices.splice(formattedQuestion.answer - 1, 0, loadedQuestion.correct_answer);
+
+            // Iterate through the answer choices
+            answerChoices.forEach((choice, index) => {
+                // Answer choices will be put in the formatted question dynamically
+                formattedQuestion['choice' + (index + 1)] = choice;
+            });
+
+            return formattedQuestion;
+        });
         // Wait until question are loaded to start game
-        questions = loadedQuestions;
+        // questions = loadedQuestions;
         startGame();
     })
     .catch((error) => {
@@ -38,6 +66,9 @@ const startGame = () => {
     // Make a full copy of the questions' []
     availableQuestions = [...questions];
     getNewQuestion();
+    // Loader
+    game.classList.remove('hidden');
+    loader.classList.add('hidden');
 };
 
 const getNewQuestion = () => {
