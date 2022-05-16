@@ -15,32 +15,22 @@ let score = 0;
 let questionCounter = 0;
 let availableQuestions = [];
 
-let questions = [
-    {
-        question: `Inside which HTML element do we put the JavaScript?`,
-        choice1: `<xmp><script></xmp>`,
-        choice2: `<xmp><javascript></xmp>`,
-        choice3: `<xmp><js></xmp>`,
-        choice4: `<xmp><scripting></xmp>`,
-        answer: 1,
-    },
-    {
-        question: `What is the correct syntax for referring to an external script called 'demo.js'?`,
-        choice1: `<xmp><script href='demo.js'></script></xmp>`,
-        choice2: `<xmp><script name='demo.js'></script></xmp>`,
-        choice3: `<xmp><script src='demo.js'></script></xmp>`,
-        choice4: `<xmp><script file='demo.js'></script></xmp>`,
-        answer: 3,
-    },
-    {
-        question: `How do you write 'Hello World' in an alert box?`,
-        choice1: `<xmp>msgBox('Hello World');</xmp>`,
-        choice2: `<xmp>alertBox('Hello World');</xmp>`,
-        choice3: `<xmp>msg('Hello World');</xmp>`,
-        choice4: `<xmp>alert('Hello World');</xmp>`,
-        answer: 4,
-    },
-];
+let questions = [];
+
+// Get question from json file using fetch
+fetch('scripts/questions.json')
+    .then((response) => {
+        return response.json();
+    })
+    .then((loadedQuestions) => {
+        console.log(loadedQuestions);
+        // Wait until question are loaded to start game
+        questions = loadedQuestions;
+        startGame();
+    })
+    .catch((error) => {
+        console.log(error);
+    });
 
 const startGame = () => {
     questionCounter = 0;
@@ -113,5 +103,3 @@ const incrementScore = (num) => {
     score += num;
     scoreText.innerHTML = score;
 };
-
-startGame();
